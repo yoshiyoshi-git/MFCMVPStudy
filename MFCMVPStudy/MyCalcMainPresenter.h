@@ -38,11 +38,11 @@ public:
 		savedata._inputNumber = currentSelectionNumber;
 		savedata._resultNumber = _numberService.CalcDouble(currentSelectionNumber);
 
-		auto callback = [this](bool sucess)
+		auto callback = [this](bool success)
 		{
 			if (_mainView)
 			{
-				_mainView->OnSaveComplete(sucess);
+				_mainView->OnSaveComplete(success);
 			}
 		};	
 
