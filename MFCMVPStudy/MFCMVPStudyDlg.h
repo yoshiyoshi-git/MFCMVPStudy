@@ -8,6 +8,8 @@
 #include "MyCalcMainPresenter.h"
 #include <memory>
 
+#define WM_SAVE_COMPLETE (WM_APP + 1001)
+
 // CMFCMVPStudyDlg ダイアログ
 class CMFCMVPStudyDlg : public CDialogEx, public MyCalcMainView
 {
@@ -32,7 +34,13 @@ public:
 	virtual void  UpdateCalcResult(const std::wstring& text) override;
 	virtual void ShowMessage(const std::wstring& message) override;
 	virtual void SetInputNumbers() override;
+
+	//ワーカーから呼ばれるので、ここではメッセージポストするだけ
+	virtual void OnSaveComplete(bool success) override;
 /***MyCalcMainViewの実装***/
+
+	//OnSaveCompleteからメッセージで呼ばれる
+	afx_msg LRESULT OnSaveCompleteMessage(WPARAM wParam, LPARAM lParam);
 
 // 実装
 protected:
@@ -48,4 +56,5 @@ public:
 	CComboBox ComboInputNumber;
 	CEdit EditResultNumber;
 	afx_msg void OnCbnSelchangeComboInputNumber();
+	afx_msg void OnBnClickedButtonSave();
 };

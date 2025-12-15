@@ -38,9 +38,28 @@ public:
 		savedata._inputNumber = currentSelectionNumber;
 		savedata._resultNumber = _numberService.CalcDouble(currentSelectionNumber);
 
-		if (_serializeService.SaveData(savedata))
-			_mainView->ShowMessage(L"保存したぁぁあああ");
+		auto callback = [this](bool sucess)
+		{
+			if (_mainView)
+			{
+				_mainView->OnSaveComplete(sucess);
+			}
+		};	
+
+		bool isstarted = _serializeService.SaveData(savedata, callback);
+		if (!isstarted)
+		{
+			_mainView->ShowMessage(L"保存スレッドの開始に失敗しました。");
+		}
+	}
+
+	void OnSaveFinished(bool success)
+	{
+		if (!_mainView)	return;
+
+		if (success)
+			_mainView->ShowMessage(L"保存完了！");
 		else
-			_mainView->ShowMessage(L"失敗したぁぁぁあああ");
+			_mainView->ShowMessage(L"保存失敗！");
 	}
 };

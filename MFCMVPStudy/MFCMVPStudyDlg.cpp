@@ -87,6 +87,13 @@ void CMFCMVPStudyDlg::SetInputNumbers()
 	}
 	ComboInputNumber.SetCurSel(0);
 }
+void CMFCMVPStudyDlg::OnSaveComplete(bool success)
+{
+	// ここで直接 Presenter を呼ばず、自分自身にメッセージを投げる（UIスレッドへ委譲）
+	if (GetSafeHwnd())
+		PostMessage(WM_SAVE_COMPLETE, (WPARAM)success, 0);
+}
+
 /***MyCalcMainViewの実装***/
 
 
@@ -96,10 +103,21 @@ BEGIN_MESSAGE_MAP(CMFCMVPStudyDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	ON_CBN_SELCHANGE(IDC_COMBO_INPUT_NUMBER, &CMFCMVPStudyDlg::OnCbnSelchangeComboInputNumber)
+	ON_BN_CLICKED(IDC_BUTTON_SAVE, &CMFCMVPStudyDlg::OnBnClickedButtonSave)
+	ON_MESSAGE(WM_SAVE_COMPLETE, &CMFCMVPStudyDlg::OnSaveCompleteMessage)
 END_MESSAGE_MAP()
 
 
 // CMFCMVPStudyDlg メッセージ ハンドラー
+LRESULT CMFCMVPStudyDlg::OnSaveCompleteMessage(WPARAM wParam, LPARAM lParam)
+{
+	bool success = (bool)wParam;
+
+	// ここは UI スレッドなので安全に Presenter を呼べる
+	_calcPresenter->OnSaveFinished(success);
+
+	return 0;
+}
 
 BOOL CMFCMVPStudyDlg::OnInitDialog()
 {
@@ -197,4 +215,9 @@ void CMFCMVPStudyDlg::OnCbnSelchangeComboInputNumber()
 		// プレゼンターに通知
 		_calcPresenter->OnNumberSelected(_ttoi(selectedtext));
 	}
+}
+
+void CMFCMVPStudyDlg::OnBnClickedButtonSave()
+{
+	_calcPresenter->OnSaveClicked();
 }
